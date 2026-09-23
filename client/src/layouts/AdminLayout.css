@@ -1,12 +1,14 @@
-:root {
+/*
+ * Toutes les variables du thème admin sont scopées à .admin-layout
+ * (jamais sur :root) pour ne jamais entrer en conflit avec celles
+ * de StudentLayout.css, qui redéfinit les mêmes noms avec d'autres valeurs.
+ */
+.admin-layout {
   --gold: #c9a84c;
   --bg-dark: #1c1a17;
   --bg-card: #252220;
   --text: #f5f5f5;
   --text-muted: #9a9a9a;
-}
-
-.admin-layout {
   --border: rgba(201, 168, 76, 0.2);
 }
 
@@ -17,8 +19,8 @@
 }
 
 body {
-  background: var(--bg-dark);
-  color: var(--text);
+  background: var(--bg-dark, #1c1a17);
+  color: var(--text, #f5f5f5);
   font-family: sans-serif;
 }
 

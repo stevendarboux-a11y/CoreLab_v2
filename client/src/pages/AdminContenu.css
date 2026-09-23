@@ -221,7 +221,7 @@
   background: rgba(201, 168, 76, 0.05);
 }
 
-.submit-btn {
+.admin-contenu .submit-btn {
   background: var(--gold);
   color: var(--bg-dark);
   border: none;
@@ -234,11 +234,11 @@
   transition: opacity 0.15s;
 }
 
-.submit-btn:hover {
+.admin-contenu .submit-btn:hover {
   opacity: 0.85;
 }
 
-.submit-btn:disabled {
+.admin-contenu .submit-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
@@ -340,7 +340,7 @@
   margin-top: 8px;
 }
 
-.edit-course-actions .submit-btn {
+.admin-contenu .edit-course-actions .submit-btn {
   width: auto;
   margin-top: 0;
 }

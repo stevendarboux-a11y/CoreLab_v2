@@ -229,7 +229,7 @@ label {
   color: var(--muted);
 }
 
-input {
+.login-page input {
   width: 100%;
   background: transparent;
   border: 1px solid var(--accent);
@@ -239,7 +239,7 @@ input {
   outline: none;
 }
 
-input:focus {
+.login-page input:focus {
   border-color: var(--accent);
   background: var(--accent-faint);
 }
@@ -271,7 +271,7 @@ input:focus {
   font-size: 13px;
 }
 
-.submit-btn {
+.login-page .submit-btn {
   background: var(--accent);
   color: #0f0e0c;
   border: none;

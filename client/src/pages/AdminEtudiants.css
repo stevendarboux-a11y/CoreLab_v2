@@ -110,7 +110,7 @@
   height: 14px;
 }
 
-.submit-btn {
+.admin-etudiants .submit-btn {
   background: var(--gold);
   color: var(--bg-dark);
   border: none;
@@ -122,11 +122,11 @@
   transition: opacity 0.15s;
 }
 
-.submit-btn:hover:not(:disabled) {
+.admin-etudiants .submit-btn:hover:not(:disabled) {
   opacity: 0.85;
 }
 
-.submit-btn:disabled {
+.admin-etudiants .submit-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
