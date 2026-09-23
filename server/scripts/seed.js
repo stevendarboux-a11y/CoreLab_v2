@@ -102,7 +102,17 @@ async function seed() {
 
   // ─── Lessons ──────────────────────────────────────────────────────────────
   const day = 1000 * 60 * 60 * 24
-  const [lessonAnnées20, lessonDior, lessonCroquis, lessonMoodboard, lessonFibres] = await Lesson.insertMany([
+  const [
+    lessonAnnées20,
+    lessonDior,
+    lessonAnnées60,
+    lessonCroquis,
+    lessonMoodboard,
+    lessonMatieres,
+    lessonFibres,
+    lessonInnovants,
+    lessonEntretien,
+  ] = await Lesson.insertMany([
     {
       title: 'Les années 20 : La libération',
       content: '<h1>Les Années 20</h1><p>Les silhouettes se raccourcissent, le corset disparaît.</p><p>C\'est l\'ère des <strong>garçonnes</strong> et de la libération du corps de la femme, menée par des créatrices comme Coco Chanel et Madeleine Vionnet.</p>',
@@ -114,6 +124,12 @@ async function seed() {
       content: '<h1>Le New Look</h1><p>Créé par <strong>Christian Dior</strong> en 1947, en réaction aux années de privation.</p><p>Il se caractérise par une taille très marquée, des épaules douces et des jupes corolles très amples.</p>',
       courseId: courseHistoire._id,
       availableFrom: new Date(Date.now() + day * 2), // pas encore dispo (dans 2 jours)
+    },
+    {
+      title: 'Les années 60 : La révolution Mod',
+      content: '<h1>Les Années 60 : La Révolution Mod</h1><p>Portée par <strong>Mary Quant</strong> à Londres, la minijupe bouleverse les codes et symbolise l\'émancipation de la jeunesse.</p><p>Le mouvement <strong>Mod</strong> puise son inspiration dans le Pop Art, avec des formes géométriques, des couleurs vives et des matières synthétiques comme le PVC.</p>',
+      courseId: courseHistoire._id,
+      availableFrom: new Date(Date.now() - day * 1),
     },
     {
       title: 'Les bases du croquis de mode',
@@ -128,21 +144,49 @@ async function seed() {
       availableFrom: new Date(Date.now() - day * 2),
     },
     {
+      title: 'Choisir ses matières et sa palette couleur',
+      content: '<h1>Matières et Palette Couleur</h1><p>Le choix des <strong>matières</strong> détermine le tombé, la texture et l\'usage final du vêtement.</p><p>La <strong>palette couleur</strong> d\'une collection raconte une histoire : elle doit rester cohérente du moodboard jusqu\'au défilé.</p>',
+      courseId: courseStylisme._id,
+      availableFrom: new Date(Date.now() - day * 1),
+    },
+    {
       title: 'Les fibres naturelles vs synthétiques',
       content: '<h1>Les Fibres</h1><p>Les fibres naturelles (coton, lin, soie, laine) proviennent de sources végétales ou animales.</p><p>Les fibres synthétiques (polyester, nylon) sont issues de la pétrochimie.</p>',
       courseId: courseTextile._id,
       availableFrom: new Date(Date.now() - day * 3),
     },
+    {
+      title: 'Les textiles innovants et éco-responsables',
+      content: '<h1>Textiles Innovants et Éco-responsables</h1><p>De nouvelles fibres comme le <strong>Tencel</strong> (à base de pulpe de bois) ou le coton biologique réduisent l\'impact environnemental de la production textile.</p><p>Le <strong>polyester recyclé</strong>, issu de bouteilles plastiques, gagne aussi du terrain dans l\'industrie de la mode.</p>',
+      courseId: courseTextile._id,
+      availableFrom: new Date(Date.now() - day * 2),
+    },
+    {
+      title: 'Entretien et durabilité des textiles',
+      content: '<h1>Entretien et Durabilité</h1><p>Bien lire une <strong>étiquette d\'entretien</strong> permet de prolonger la durée de vie d\'un vêtement et de limiter son impact écologique.</p><p>Un lavage à basse température et un séchage à l\'air libre réduisent l\'usure des fibres.</p>',
+      courseId: courseTextile._id,
+      availableFrom: new Date(Date.now() - day * 1),
+    },
   ])
 
   // Mise à jour des leçons dans les cours
-  await Course.findByIdAndUpdate(courseHistoire._id, { lessons: [lessonAnnées20._id, lessonDior._id] })
-  await Course.findByIdAndUpdate(courseStylisme._id, { lessons: [lessonCroquis._id, lessonMoodboard._id] })
-  await Course.findByIdAndUpdate(courseTextile._id, { lessons: [lessonFibres._id] })
+  await Course.findByIdAndUpdate(courseHistoire._id, { lessons: [lessonAnnées20._id, lessonDior._id, lessonAnnées60._id] })
+  await Course.findByIdAndUpdate(courseStylisme._id, { lessons: [lessonCroquis._id, lessonMoodboard._id, lessonMatieres._id] })
+  await Course.findByIdAndUpdate(courseTextile._id, { lessons: [lessonFibres._id, lessonInnovants._id, lessonEntretien._id] })
   console.log('Lessons créées')
 
   // ─── Quizzes ──────────────────────────────────────────────────────────────
-  const [quizHistoire, quizStylisme, quizTextile] = await Quiz.insertMany([
+  const [
+    quizHistoire,
+    quizNewLook,
+    quizAnnées60,
+    quizStylisme,
+    quizMoodboard,
+    quizMatieres,
+    quizTextile,
+    quizInnovants,
+    quizEntretien,
+  ] = await Quiz.insertMany([
     {
       title: 'Quiz - Les Années 20',
       lesson: lessonAnnées20._id,
@@ -162,6 +206,55 @@ async function seed() {
           prompt: 'Comment s\'appelle la fameuse petite robe noire inventée en 1926 ?',
           choices: ['La robe Ford', 'La robe Cocktail', 'La robe New Look', 'La robe de Bal'],
           correctIndexes: [0], // Optionnel: un petit challenge historique
+        },
+      ],
+    },
+    {
+      title: 'Quiz - Le New Look',
+      lesson: lessonDior._id,
+      passingScore: 60,
+      questions: [
+        {
+          prompt: 'Qui a créé le New Look ?',
+          choices: ['Coco Chanel', 'Christian Dior', 'Yves Saint Laurent', 'Elsa Schiaparelli'],
+          correctIndexes: [1],
+        },
+        {
+          prompt: 'En quelle année le New Look est-il créé ?',
+          choices: ['1920', '1937', '1947', '1957'],
+          correctIndexes: [2],
+        },
+        {
+          prompt: 'Le New Look est une réaction à quoi ?',
+          choices: ['Aux années de privation de la guerre', 'Au mouvement punk', 'À la crise de 1929', 'Aux tendances japonaises'],
+          correctIndexes: [0],
+        },
+        {
+          prompt: 'Quelles caractéristiques retrouve-t-on dans le New Look ? (plusieurs choix)',
+          choices: ['Une taille très marquée', 'Des épaules larges et carrées', 'Des épaules douces', 'Des jupes corolles très amples'],
+          correctIndexes: [0, 2, 3],
+        },
+      ],
+    },
+    {
+      title: 'Quiz - Les Années 60',
+      lesson: lessonAnnées60._id,
+      passingScore: 60,
+      questions: [
+        {
+          prompt: 'Qui popularise la minijupe dans les années 60 ?',
+          choices: ['Mary Quant', 'Coco Chanel', 'Vivienne Westwood', 'Elsa Schiaparelli'],
+          correctIndexes: [0],
+        },
+        {
+          prompt: 'Quel mouvement artistique influence la mode Mod ?',
+          choices: ['Le Cubisme', 'Le Pop Art', 'Le Surréalisme', 'L\'Impressionnisme'],
+          correctIndexes: [1],
+        },
+        {
+          prompt: 'Quelle matière synthétique devient emblématique de cette période ?',
+          choices: ['Le lin', 'Le PVC', 'La laine', 'Le cachemire'],
+          correctIndexes: [1],
         },
       ],
     },
@@ -188,6 +281,45 @@ async function seed() {
       ],
     },
     {
+      title: 'Quiz - Le Moodboard',
+      lesson: lessonMoodboard._id,
+      passingScore: 50,
+      questions: [
+        {
+          prompt: 'Comment appelle-t-on aussi le moodboard ?',
+          choices: ['Le patron de base', 'La planche de tendance', 'Le cahier des charges', 'Le book de portfolio'],
+          correctIndexes: [1],
+        },
+        {
+          prompt: 'Que rassemble un moodboard ? (plusieurs choix)',
+          choices: ['Des images', 'Des textures', 'Le prix de vente final', 'Des couleurs et mots-clés'],
+          correctIndexes: [0, 1, 3],
+        },
+        {
+          prompt: 'Quel est le rôle principal du moodboard dans une collection ?',
+          choices: ['Servir de fil conducteur visuel', 'Remplacer le croquis technique', 'Calculer les coûts de production', 'Servir de facture client'],
+          correctIndexes: [0],
+        },
+      ],
+    },
+    {
+      title: 'Quiz - Matières et Couleurs',
+      lesson: lessonMatieres._id,
+      passingScore: 50,
+      questions: [
+        {
+          prompt: 'Qu\'est-ce qui détermine le tombé d\'un vêtement ?',
+          choices: ['Le prix', 'La matière choisie', 'La marque', 'La taille de l\'étiquette'],
+          correctIndexes: [1],
+        },
+        {
+          prompt: 'Pourquoi la palette couleur d\'une collection doit-elle rester cohérente ?',
+          choices: ['Pour réduire les coûts', 'Pour raconter une histoire cohérente', 'Par obligation légale', 'Ce n\'est pas nécessaire'],
+          correctIndexes: [1],
+        },
+      ],
+    },
+    {
       title: 'Quiz - Fibres Textiles',
       lesson: lessonFibres._id,
       passingScore: 70,
@@ -201,6 +333,40 @@ async function seed() {
           prompt: 'Quelle fibre est issue de la pétrochimie ?',
           choices: ['Polyester', 'Laine', 'Chanvre', 'Viscose'],
           correctIndexes: [0],
+        },
+      ],
+    },
+    {
+      title: 'Quiz - Textiles Innovants',
+      lesson: lessonInnovants._id,
+      passingScore: 60,
+      questions: [
+        {
+          prompt: 'À partir de quoi est fabriqué le Tencel ?',
+          choices: ['Du pétrole', 'De la pulpe de bois', 'Des coquillages', 'Des algues'],
+          correctIndexes: [1],
+        },
+        {
+          prompt: 'D\'où provient le polyester recyclé couramment utilisé en mode ?',
+          choices: ['Des bouteilles plastiques', 'Du coton usagé', 'De la laine recyclée', 'Du chanvre'],
+          correctIndexes: [0],
+        },
+      ],
+    },
+    {
+      title: 'Quiz - Entretien Textile',
+      lesson: lessonEntretien._id,
+      passingScore: 50,
+      questions: [
+        {
+          prompt: 'Que permet de prolonger un bon entretien du vêtement ?',
+          choices: ['Sa durée de vie', 'Son prix de vente', 'Sa couleur d\'origine uniquement', 'Rien de particulier'],
+          correctIndexes: [0],
+        },
+        {
+          prompt: 'Quelle pratique réduit l\'usure des fibres ?',
+          choices: ['Lavage à haute température', 'Séchage en machine systématique', 'Lavage à basse température', 'Repassage quotidien'],
+          correctIndexes: [2],
         },
       ],
     },
@@ -243,6 +409,23 @@ async function seed() {
       passed: true,
       attemptedAt: new Date(Date.now() - day * 2),
     },
+    // Emma : première activité sur ses nouveaux quiz Textile
+    {
+      student: emma._id,
+      quiz: quizTextile._id,
+      answers: [1, 0], // toutes correctes → 100%
+      score: 100,
+      passed: true,
+      attemptedAt: new Date(Date.now() - day * 2),
+    },
+    {
+      student: emma._id,
+      quiz: quizInnovants._id,
+      answers: [1, 0], // toutes correctes → 100%
+      score: 100,
+      passed: true,
+      attemptedAt: new Date(Date.now() - day * 1),
+    },
   ])
   console.log('Attempts créés')
 
@@ -273,6 +456,27 @@ async function seed() {
       student: david._id,
       lesson: lessonMoodboard._id,
       message: 'La leçon "Créer un moodboard" est maintenant disponible.',
+      read: false,
+      type: 'lesson',
+    },
+    {
+      student: bob._id,
+      lesson: lessonAnnées60._id,
+      message: 'La leçon "Les années 60 : La révolution Mod" est maintenant disponible.',
+      read: false,
+      type: 'lesson',
+    },
+    {
+      student: emma._id,
+      lesson: lessonInnovants._id,
+      message: 'La leçon "Les textiles innovants et éco-responsables" est maintenant disponible.',
+      read: false,
+      type: 'lesson',
+    },
+    {
+      student: emma._id,
+      lesson: lessonEntretien._id,
+      message: 'La leçon "Entretien et durabilité des textiles" est maintenant disponible.',
       read: false,
       type: 'lesson',
     },
