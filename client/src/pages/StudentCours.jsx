@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 import { getLessons, fetchProgress, getStudentCourses } from "../api/student.js";
+import { CourseCard } from "../components/CourseCard.jsx";
 import "./StudentCours.css";
 
 function StudentCours() {
@@ -76,18 +77,24 @@ function StudentCours() {
           )}
         </div>
 
-        {/* Barre de progression du cours sélectionné */}
+        {/* Anneau de progression SVG + typographie XXL du cours sélectionné */}
         {progress && (
           <div className="cours-progress-row">
-            <div className="cours-progress-bar">
-              <div
-                className="cours-progress-fill"
-                style={{ width: `${progress.progressPercent}%` }}
-              />
+            <div
+              className="progress-ring"
+              style={{ "--pct": progress.progressPercent }}
+            >
+              <svg viewBox="0 0 100 100">
+                <circle className="ring-bg" cx="50" cy="50" r="42" />
+                <circle className="ring-fill" cx="50" cy="50" r="42" />
+              </svg>
+              <span className="progress-ring-value">
+                {progress.progressPercent}%
+              </span>
             </div>
-            <span>
-              {progress.progressPercent}% complété -{" "}
+            <span className="cours-progress-label">
               {progress.completedLessons}/{progress.totalLessons} leçons
+              complétées
             </span>
           </div>
         )}
@@ -102,30 +109,21 @@ function StudentCours() {
         {!loading && lessons.length > 0 && (
           <div className="lessons-list">
             {lessons.map((lesson, i) => (
-              <div key={lesson._id} className="lesson-item">
-                <div className="lesson-number">
-                  {String(i + 1).padStart(2, "0")}
-                </div>
-                <div className="lesson-info">
-                  <p className="lesson-title">{lesson.title}</p>
-                  <small>
-                    Disponible depuis le{" "}
-                    {new Date(lesson.availableFrom).toLocaleDateString("fr-FR")}
-                  </small>
-                </div>
-                <span className="lesson-badge">Disponible</span>
-                {/* On passe courseName en state pour l'afficher sur la page leçon */}
-                <button
-                  className="lesson-open-btn"
-                  onClick={() =>
-                    navigate(`/dashboard/cours/${lesson._id}`, {
-                      state: { courseName },
-                    })
-                  }
-                >
-                  Ouvrir →
-                </button>
-              </div>
+              <CourseCard
+                key={lesson._id}
+                index={i}
+                featured={i === 0}
+                number={String(i + 1).padStart(2, "0")}
+                title={lesson.title}
+                date={new Date(lesson.availableFrom).toLocaleDateString("fr-FR")}
+                status="Disponible"
+                // On passe courseName en state pour l'afficher sur la page leçon
+                onOpen={() =>
+                  navigate(`/dashboard/cours/${lesson._id}`, {
+                    state: { courseName },
+                  })
+                }
+              />
             ))}
           </div>
         )}

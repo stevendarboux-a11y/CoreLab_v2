@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext.jsx";
 import { getStudentCourses, getLessonQuiz, getStudentAttempts } from "../api/student.js";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { ArrowRight, CheckCircle2, Lock } from "lucide-react";
 import "./StudentExamens.css";
 
 function StudentExamens() {
@@ -70,21 +72,28 @@ function StudentExamens() {
 
       {/* Une section par cours, avec ses leçons et le bouton quiz */}
       <div className="examens-list">
-        {courses.map((course) => (
-          <div key={course._id} className="course-block">
+        {courses.map((course, ci) => (
+          <motion.div
+            key={course._id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: ci * 0.1, ease: [0.25, 1, 0.5, 1] }}
+            className="course-block"
+          >
             <h2>{course.title}</h2>
             
             {!course.lessons || course.lessons.length === 0 ? (
               <p className="examens-state">Aucune leçon disponible.</p>
             ) : (
-              course.lessons.map((lesson) => {
+              course.lessons.map((lesson, li) => {
                 const isAvailable = new Date(lesson.availableFrom) <= new Date();
                 const attempt = attempts.find((a) => a.quiz?.lesson === lesson._id);
                 const hasAttempted = !!attempt;
 
                 return (
                   <div key={lesson._id} className="lesson-row">
-                    <div>
+                    <span className="lesson-num">{String(li + 1).padStart(2, "0")}</span>
+                    <div className="lesson-row-info">
                       <p className="lesson-title">{lesson.title}</p>
                       {hasAttempted ? (
                         <small className="muted">
@@ -104,19 +113,27 @@ function StudentExamens() {
                       onClick={() => handleQuizClick(lesson._id)}
                       disabled={!isAvailable || hasAttempted || loadingQuiz === lesson._id}
                     >
-                      {hasAttempted
-                        ? "Déjà passé"
-                        : !isAvailable
-                        ? "Verrouillé"
-                        : loadingQuiz === lesson._id
-                        ? "…"
-                        : "Passer le quiz"}
+                      {hasAttempted ? (
+                        <>
+                          <CheckCircle2 size={14} /> Déjà passé
+                        </>
+                      ) : !isAvailable ? (
+                        <>
+                          <Lock size={14} /> Verrouillé
+                        </>
+                      ) : loadingQuiz === lesson._id ? (
+                        "…"
+                      ) : (
+                        <>
+                          Passer le quiz <ArrowRight size={14} />
+                        </>
+                      )}
                     </button>
                   </div>
                 );
               })
             )}
-          </div>
+          </motion.div>
         ))}
       </div>
     </div>

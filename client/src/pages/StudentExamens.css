@@ -8,7 +8,8 @@
 }
 
 .examens-header h1 {
-  font-size: 28px;
+  font-family: var(--font-serif, serif);
+  font-size: 30px;
   font-weight: 700;
   color: var(--text);
 }
@@ -32,8 +33,25 @@
 
 .course-block {
   background: var(--bg-card);
-  border: 1px solid var(--border);
+  border: var(--border-width, 1px) solid var(--border);
+  border-radius: var(--radius, 16px);
+  box-shadow: var(--card-shadow, none);
   padding: 24px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.student-layout[data-theme="streetwear"] .course-block {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.student-layout[data-theme="streetwear"] .course-block:hover {
+  transform: translate(-4px, -4px);
+  box-shadow: var(--card-shadow);
 }
 
 .course-block h2 {
@@ -47,19 +65,42 @@
 }
 
 .lesson-row {
+  position: relative;
+  overflow: hidden;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 12px 0;
-  border-bottom: 1px solid rgba(100, 180, 160, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .lesson-row:last-child {
   border-bottom: none;
 }
 
+.lesson-num {
+  position: absolute;
+  left: -4px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font-serif, serif);
+  font-size: 2.8rem;
+  font-weight: 800;
+  color: #fff;
+  opacity: 0.08;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.lesson-row-info {
+  position: relative;
+  z-index: 1;
+  padding-left: 44px;
+}
+
 .lesson-title {
-  font-size: 14px;
+  font-family: var(--font-serif, serif);
+  font-size: 15px;
   color: var(--text);
   margin-bottom: 4px;
 }
@@ -73,10 +114,16 @@
   background: var(--green);
   color: var(--bg-dark);
   border: none;
+  border-radius: var(--radius, 8px);
   padding: 8px 16px;
   font-size: 12px;
   font-weight: 600;
+  font-family: var(--font-sans);
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   transition: opacity 0.15s;
 }
 
@@ -93,6 +140,8 @@
 @media (max-width: 768px) {
   .student-examens { padding: 24px 16px; }
   .lesson-row { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .lesson-num { position: static; transform: none; font-size: 2rem; margin-bottom: -8px; }
+  .lesson-row-info { padding-left: 0; }
   .quiz-link-btn { width: 100%; text-align: center; }
   .course-block { padding: 16px; }
 }

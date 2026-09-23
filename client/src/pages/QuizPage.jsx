@@ -87,17 +87,29 @@ function QuizPage() {
         <div className="quiz-container">
         <div className="quiz-header">
             <h1>{quiz.title}</h1>
-            <span className="quiz-progress">
-            {answers.filter((a) => a !== null).length} / {quiz.questions.length} répondues
-            </span>
+            <div
+              className="progress-ring progress-ring-sm"
+              style={{
+                "--pct": Math.round(
+                  (answers.filter((a) => a !== null).length / quiz.questions.length) * 100
+                ),
+              }}
+            >
+              <svg viewBox="0 0 100 100">
+                <circle className="ring-bg" cx="50" cy="50" r="42" />
+                <circle className="ring-fill" cx="50" cy="50" r="42" />
+              </svg>
+              <span className="progress-ring-value">
+                {answers.filter((a) => a !== null).length}/{quiz.questions.length}
+              </span>
+            </div>
         </div>
 
         <div className="quiz-questions">
             {quiz.questions.map((q, qi) => (
             <div key={qi} className={`question-card ${answers[qi] !== null ? "answered" : ""}`}>
-                <p className="question-prompt">
-                <span className="question-number">{qi + 1}.</span> {q.prompt}
-                </p>
+                <span className="question-number-watermark">{String(qi + 1).padStart(2, "0")}</span>
+                <p className="question-prompt">{q.prompt}</p>
                 <div className="choices">
                 {q.choices.map((choice, ci) => (
                     <button

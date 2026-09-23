@@ -92,19 +92,19 @@ function StudentDashboard() {
 
       <div className="dashboard-body">
         <div className="dashboard-left">
-          <div className="welcome-card">
+          <div className="welcome-card glow-card">
             <h2>Bonne reprise, {user?.name?.split(" ")[0]} ✦</h2>
             <p>Stylisme 2024 · Paris - Milan · Semestre 3 en cours · AW 2026</p>
           </div>
 
           {/* Stats : cours assignés + moyenne réelle */}
           <div className="stats-grid">
-            <div className="stat-card">
+            <div className="stat-card glow-card">
               <small>Cours suivis</small>
               <strong>{user?.courses?.length ?? 0}</strong>
               <span>cours assignés</span>
             </div>
-            <div className="stat-card">
+            <div className="stat-card glow-card">
               <small>Moyenne générale</small>
               <strong>{moyenne !== null ? `${moyenne}/20` : "-"}</strong>
               <span>{attempts.length} quiz passés</span>
@@ -119,29 +119,35 @@ function StudentDashboard() {
                 Chargement...
               </p>
             ) : (
-              modules.map((module) => (
-                <div key={module.name} className="progress-row">
-                  <div className="progress-info">
-                    <span>{module.name}</span>
-                    <span>
-                      {module.lessons} leçons · {module.progress}%
-                    </span>
-                  </div>
-                  <div className="progress-bar">
+              <div className="modules-ring-grid">
+                {modules.map((module) => (
+                  <div key={module.name} className="module-ring-card">
                     <div
-                      className="progress-fill"
-                      style={{ width: `${module.progress}%` }}
-                    />
+                      className="progress-ring progress-ring-sm"
+                      style={{ "--pct": module.progress }}
+                    >
+                      <svg viewBox="0 0 100 100">
+                        <circle className="ring-bg" cx="50" cy="50" r="42" />
+                        <circle className="ring-fill" cx="50" cy="50" r="42" />
+                      </svg>
+                      <span className="progress-ring-value">
+                        {module.progress}%
+                      </span>
+                    </div>
+                    <div className="module-ring-info">
+                      <span>{module.name}</span>
+                      <small>{module.lessons} leçons</small>
+                    </div>
                   </div>
-                </div>
-              ))
+                ))}
+              </div>
             )}
           </div>
         </div>
 
         <div className="dashboard-right">
           {/* Prochaine leçon : la leçon à l'index = nombre de leçons complétées */}
-          <div className="next-lesson-card">
+          <div className="next-lesson-card glow-card">
             <small>Prochaine Leçon</small>
             <h3>{nextLesson?.title ?? "-"}</h3>
             <div className="lesson-meta">

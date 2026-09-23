@@ -1,9 +1,9 @@
 .dashboard {
   padding: 32px 40px;
   min-height: 100vh;
-  background: var(--bg-dark, #1c1a17);
+  background: var(--bg-dark, #0a0a0a);
   color: var(--text, #f5f5f5);
-  font-family: sans-serif;
+  font-family: var(--font-sans, sans-serif);
 }
 
 /* ── Header ── */
@@ -13,11 +13,12 @@
   align-items: flex-start;
   margin-bottom: 32px;
   padding-bottom: 20px;
-  border-bottom: 1px solid rgba(100, 180, 160, 0.2);
+  border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.08));
 }
 
 .dashboard-header h1 {
-  font-size: 28px;
+  font-family: var(--font-serif, serif);
+  font-size: 30px;
   font-weight: 700;
   color: #f5f5f5;
   margin-bottom: 4px;
@@ -29,8 +30,8 @@
 }
 
 .dashboard .season-badge {
-  border: 1px solid rgba(100, 180, 160, 0.4);
-  color: #64b4a0;
+  border: 1px solid color-mix(in srgb, var(--green) 40%, transparent);
+  color: var(--green, #3ddc97);
   padding: 6px 14px;
   font-size: 13px;
 }
@@ -54,15 +55,68 @@
   gap: 24px;
 }
 
+/* ── Glow border animé (Bento Grid) ── */
+.glow-card {
+  position: relative;
+  isolation: isolate;
+  background: var(--bg-card, #0a0a0a);
+  border: var(--border-width, 1px) solid var(--border, rgba(255, 255, 255, 0.08));
+  border-radius: var(--radius, 12px);
+  box-shadow: var(--card-shadow, none);
+  font-family: var(--font-sans);
+}
+
+/* Streetwear : pas de lueur qui tourne, un saut sec + ombre nette au survol */
+.student-layout[data-theme="streetwear"] .glow-card {
+  box-shadow: none;
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.student-layout[data-theme="streetwear"] .glow-card:hover {
+  transform: translate(-4px, -4px);
+  box-shadow: var(--card-shadow);
+}
+
+.student-layout[data-theme="streetwear"] .glow-card::before {
+  display: none;
+}
+
+.glow-card::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--angle, 0deg),
+    transparent 0 40%,
+    var(--green, #3ddc97) 50%,
+    transparent 60% 100%
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  animation: spin-glow 4s linear infinite;
+  animation-play-state: paused;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.glow-card:hover::before {
+  opacity: 1;
+  animation-play-state: running;
+}
+
 /* ── Carte bienvenue ── */
 .welcome-card {
-  background: #252220;
-  border: 1px solid rgba(100, 180, 160, 0.2);
   padding: 24px;
 }
 
 .welcome-card h2 {
-  font-size: 20px;
+  font-family: var(--font-serif, serif);
+  font-size: 21px;
   font-weight: 700;
   margin-bottom: 8px;
 }
@@ -74,13 +128,11 @@
 /* ── Stats ── */
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 12px;
 }
 
 .stat-card {
-  background: #252220;
-  border: 1px solid rgba(100, 180, 160, 0.15);
   padding: 16px;
   display: flex;
   flex-direction: column;
@@ -94,7 +146,7 @@
 .stat-card strong {
   font-size: 22px;
   font-weight: 700;
-  color: #64b4a0;
+  color: var(--green, #3ddc97);
 }
 .stat-card span {
   font-size: 11px;
@@ -109,47 +161,88 @@
 }
 
 .progress-section h3 {
-  font-size: 15px;
+  font-family: var(--font-serif, serif);
+  font-size: 17px;
   font-weight: 600;
-  color: #64b4a0;
+  color: var(--green, #3ddc97);
   margin-bottom: 12px;
 }
 
-.progress-row {
-  margin-bottom: 14px;
+/* ── Grille d'anneaux de progression ── */
+.modules-ring-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 20px;
 }
 
-.progress-info {
+.module-ring-card {
   display: flex;
-  justify-content: space-between;
-  font-size: 13px;
-  margin-bottom: 6px;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+}
+
+.module-ring-info span {
+  display: block;
+  font-size: 12px;
   color: #ccc;
 }
 
-.progress-info span:last-child {
+.module-ring-info small {
+  font-size: 11px;
   color: #9a9a9a;
-  font-size: 12px;
 }
 
-.progress-bar {
-  height: 6px;
-  background: #333;
-  border-radius: 3px;
-  overflow: hidden;
+.progress-ring {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  flex-shrink: 0;
 }
 
-.progress-fill {
+.progress-ring-sm {
+  width: 76px;
+  height: 76px;
+}
+
+.progress-ring svg {
+  width: 100%;
   height: 100%;
-  background: #64b4a0;
-  border-radius: 3px;
-  transition: width 0.3s ease;
+  transform: rotate(-90deg);
+}
+
+.progress-ring circle {
+  fill: none;
+  stroke-width: 4;
+}
+
+.progress-ring .ring-bg {
+  stroke: var(--border, rgba(255, 255, 255, 0.08));
+}
+
+.progress-ring .ring-fill {
+  stroke: var(--green, #3ddc97);
+  stroke-linecap: round;
+  stroke-dasharray: 264;
+  stroke-dashoffset: calc(264 - (264 * var(--pct)) / 100);
+  transition: stroke-dashoffset 0.5s ease;
+}
+
+.progress-ring-value {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-serif, serif);
+  font-weight: 700;
+  color: var(--text, #f5f5f5);
+  font-size: 15px;
 }
 
 /* ── Prochaine leçon ── */
 .next-lesson-card {
-  background: #252220;
-  border: 1px solid rgba(100, 180, 160, 0.2);
   padding: 24px;
   display: flex;
   flex-direction: column;
@@ -157,13 +250,14 @@
 }
 
 .next-lesson-card small {
-  color: #64b4a0;
+  color: var(--green, #3ddc97);
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
 .next-lesson-card h3 {
-  font-size: 16px;
+  font-family: var(--font-serif, serif);
+  font-size: 18px;
   font-weight: 700;
   line-height: 1.4;
 }
@@ -188,20 +282,50 @@
 }
 
 .resume-btn {
-  background: #64b4a0;
-  color: #1c1a17;
+  background: var(--green, #3ddc97);
+  color: var(--bg-dark, #0a0a0a);
   border: none;
+  border-radius: var(--radius, 0);
   padding: 14px;
   font-weight: 700;
   font-size: 14px;
+  font-family: var(--font-sans);
   cursor: pointer;
   width: 100%;
   margin-top: 4px;
+  transition: opacity 0.15s;
+}
+
+.resume-btn:hover {
+  opacity: 0.85;
+}
+
+/* Streetwear : le bouton se met entre crochets au survol, façon étiquette */
+.student-layout[data-theme="streetwear"] .resume-btn::before,
+.student-layout[data-theme="streetwear"] .resume-btn::after {
+  content: "";
+  opacity: 0;
+  transition: opacity 0.1s;
+}
+
+.student-layout[data-theme="streetwear"] .resume-btn:hover {
+  opacity: 1;
+}
+
+.student-layout[data-theme="streetwear"] .resume-btn:hover::before {
+  content: "[ ";
+  opacity: 1;
+}
+
+.student-layout[data-theme="streetwear"] .resume-btn:hover::after {
+  content: " ]";
+  opacity: 1;
 }
 
 /* ── Activité récente ── */
 .activity-section h3 {
-  font-size: 15px;
+  font-family: var(--font-serif, serif);
+  font-size: 17px;
   font-weight: 600;
   margin-bottom: 12px;
   color: #f5f5f5;
@@ -231,7 +355,7 @@
 }
 
 .activity-item.success p {
-  color: #64b4a0;
+  color: var(--green, #3ddc97);
 }
 .activity-item.fail p {
   color: #e07070;

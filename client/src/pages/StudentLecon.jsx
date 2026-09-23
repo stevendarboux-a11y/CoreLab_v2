@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { motion } from "framer-motion";
+import { ArrowLeft, ArrowRight, CheckCircle2, ChevronRight } from "lucide-react";
 import { useAuth } from "../context/AuthContext.jsx";
-import { getLesson, getLessons, getLessonQuiz } from "../api/student.js";
+import { getLesson, getLessons, getLessonQuiz, fetchProgress } from "../api/student.js";
 import "./StudentLecon.css";
 
 function StudentLecon() {
@@ -15,6 +17,7 @@ function StudentLecon() {
   // ── États ──────────────────────────────────────────────────────────────────
   const [lesson, setLesson] = useState(null);           // contenu de la leçon
   const [courseLessons, setCourseLessons] = useState([]); // toutes les leçons du cours (sidebar)
+  const [completedCount, setCompletedCount] = useState(0); // leçons déjà complétées dans ce cours
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [loadingQuiz, setLoadingQuiz] = useState(false);
@@ -22,18 +25,22 @@ function StudentLecon() {
   // courseName transmis via navigate(..., { state }) depuis StudentCours
   const courseName = location.state?.courseName ?? "Mes Cours";
 
-  // ── Chargement séquentiel : leçon d'abord, puis leçons du cours ────────────
-  // On ne peut pas utiliser Promise.all ici : getLessons a besoin de lesson.courseId
-  // qui n'est connu qu'après la réponse de getLesson
+  // ── Chargement séquentiel : leçon d'abord, puis leçons + progression du cours ──
+  // On ne peut pas tout paralléliser : getLessons/fetchProgress ont besoin de
+  // lesson.courseId, qui n'est connu qu'après la réponse de getLesson
   useEffect(() => {
     setLoading(true);
     getLesson(lessonId, token)
       .then((lessonData) => {
         setLesson(lessonData);
-        return getLessons(lessonData.courseId, token); // 2ème appel dépend du 1er
+        return Promise.all([
+          getLessons(lessonData.courseId, token),
+          fetchProgress(lessonData.courseId, token),
+        ]);
       })
-      .then((lessonsData) => {
+      .then(([lessonsData, progressData]) => {
         setCourseLessons(lessonsData);
+        setCompletedCount(progressData.completedLessons);
         setLoading(false);
       })
       .catch((err) => {
@@ -67,37 +74,60 @@ function StudentLecon() {
   // ── Rendu ──────────────────────────────────────────────────────────────────
   return (
     <div className="student-lecon">
-      <div className="lecon-header">
-        <div>
-          <h1>Lecture de Leçon</h1>
-          <p>
-            {courseName} - Leçon{" "}
-            {String(currentIndex + 1).padStart(2, "0")}
-          </p>
+      {/* Fil d'Ariane & Saison */}
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="lecon-breadcrumb-row"
+      >
+        <div className="lecon-breadcrumb">
+          <span>MODULE</span>
+          <ChevronRight size={14} />
+          <span className="lecon-breadcrumb-course">{courseName.toUpperCase()}</span>
+          <ChevronRight size={14} />
+          <span className="lecon-breadcrumb-current">
+            LEÇON {String(currentIndex + 1).padStart(2, "0")}
+          </span>
         </div>
         <span className="lecon-season">AW 2026</span>
-      </div>
+      </motion.div>
 
       <div className="lecon-body">
-        <div className="lecon-main">
-          <div className="lecon-content">
-            <h2>{lesson.title}</h2>
-            {/* dangerouslySetInnerHTML : injecte le HTML stocké en base directement */}
-            <div
-              className="lecon-html"
-              dangerouslySetInnerHTML={{ __html: lesson.content }}
-            />
-          </div>
-        </div>
+        {/* Colonne de gauche : contenu de la leçon, style article ── */}
+        <motion.article
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="lecon-content"
+        >
+          <header className="lecon-content-header">
+            <span className="lecon-eyebrow">
+              Atelier d'étude · Chapitre {currentIndex + 1}
+            </span>
+            <h1>{lesson.title}</h1>
+          </header>
 
+          {/* dangerouslySetInnerHTML : injecte le HTML stocké en base directement */}
+          <div
+            className="lecon-html"
+            dangerouslySetInnerHTML={{ __html: lesson.content }}
+          />
+        </motion.article>
+
+        {/* Colonne de droite : progression, QCM, navigation ── */}
         <aside className="lecon-sidebar">
-          {/* Liste de toutes les leçons du cours pour naviguer */}
-          <div className="sidebar-module">
-            <h3>Progression du Module</h3>
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2 }}
+            className="sidebar-module"
+          >
+            <h3>Progression du module</h3>
             {courseLessons.map((l, i) => (
               <div
                 key={l._id}
-                className={`module-item ${l._id === lessonId ? "current" : ""}`}
+                className={`module-item ${l._id === lessonId ? "current" : ""} ${i < completedCount ? "done" : ""}`}
+                data-num={String(i + 1).padStart(2, "0")}
                 onClick={() =>
                   navigate(`/dashboard/cours/${l._id}`, {
                     state: { courseName },
@@ -108,17 +138,23 @@ function StudentLecon() {
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 <span className="module-title">{l.title}</span>
+                {i < completedCount && (
+                  <CheckCircle2 size={16} className="module-done-icon" />
+                )}
               </div>
             ))}
-          </div>
+          </motion.div>
 
-          <button
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             className="lecon-quiz-btn"
             onClick={handleQuizClick}
             disabled={loadingQuiz}
           >
-            {loadingQuiz ? "…" : "Passer le QCM →"}
-          </button>
+            <span>{loadingQuiz ? "…" : "Passer le QCM du module"}</span>
+            {!loadingQuiz && <ArrowRight size={18} />}
+          </motion.button>
 
           {/* Navigation précédente / suivante */}
           <div className="lecon-nav">
@@ -131,7 +167,7 @@ function StudentLecon() {
               }
               disabled={!prevLesson}
             >
-              ← Leçon {String(currentIndex).padStart(2, "0")}
+              <ArrowLeft size={14} /> Leçon préc.
             </button>
             <button
               className="nav-btn"
@@ -142,7 +178,7 @@ function StudentLecon() {
               }
               disabled={!nextLesson}
             >
-              Leçon {String(currentIndex + 2).padStart(2, "0")} →
+              Leçon suiv. <ArrowRight size={14} />
             </button>
           </div>
         </aside>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext.jsx";
 import { getNotifications, markNotificationRead } from "../api/student.js";
+import { NotificationItem } from "../components/NotificationItem.jsx";
 import "./StudentNotifications.css";
 
 function StudentNotifications() {
@@ -44,21 +45,13 @@ function StudentNotifications() {
 
       <div className="notif-list">
         {notifications.map((n) => (
-          <div
+          <NotificationItem
             key={n._id}
-            className={`notif-item ${n.read ? "read" : "unread"}`}
+            title={n.message}
+            date={`${n.lesson?.title ?? ""} - ${new Date(n.sentAt).toLocaleDateString("fr-FR")}`}
+            isRead={n.read}
             onClick={() => !n.read && handleRead(n._id)}
-          >
-            <div className="notif-dot" />
-            <div className="notif-body">
-              <p>{n.message}</p>
-              <small>
-                {n.lesson?.title} -{" "}
-                {new Date(n.sentAt).toLocaleDateString("fr-FR")}
-              </small>
-            </div>
-            {!n.read && <span className="notif-cta">Marquer comme lue</span>}
-          </div>
+          />
         ))}
       </div>
     </div>
