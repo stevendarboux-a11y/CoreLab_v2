@@ -117,7 +117,10 @@ router.get('/progress/:courseId', verifyToken, async (req, res, next) => {
   try {
     const studentId = new mongoose.Types.ObjectId(req.user.userId)
     const courseId = new mongoose.Types.ObjectId(req.params.courseId)
-    const lessons = await Lesson.find({ courseId })
+    // Ne compte que les leçons déjà disponibles : sinon le total inclut des
+    // leçons verrouillées que l'étudiant ne voit même pas dans sa liste,
+    // ce qui rend la fraction affichée incohérente avec ce qu'il voit.
+    const lessons = await Lesson.find({ courseId, availableFrom: { $lte: Date.now() } })
     const totalLessons = lessons.length
     if (totalLessons === 0) {
       return res.json({ courseId: req.params.courseId, totalLessons: 0, completedLessons: 0, progressPercent: 0 })
