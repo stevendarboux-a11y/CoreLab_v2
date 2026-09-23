@@ -1,0 +1,94 @@
+.notification-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  background: var(--bg-card);
+  border: var(--border-width, 1px) solid var(--border);
+  border-radius: var(--radius, 10px);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  margin-bottom: 12px;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  transition: border-color 0.15s;
+}
+
+.student-layout[data-theme="streetwear"] .notification-item {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.notification-item.unread {
+  border-left: 3px solid var(--green);
+}
+
+.notification-item.unread:hover {
+  border-color: var(--green);
+}
+
+.notification-item.read {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.notification-dot-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.notification-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--green);
+  border-radius: 50%;
+}
+
+.notification-item.read .notification-dot {
+  background: var(--text-muted);
+}
+
+.notification-dot-ping {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: var(--green);
+  border-radius: 50%;
+  animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+  opacity: 0.75;
+}
+
+.notification-body {
+  flex: 1;
+}
+
+.notification-body p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--text);
+}
+
+.notification-body span {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.notification-cta {
+  font-size: 11px;
+  color: var(--green);
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .notification-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 14px 16px;
+  }
+  .notification-cta {
+    align-self: flex-end;
+  }
+}
