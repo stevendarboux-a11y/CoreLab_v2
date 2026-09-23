@@ -11,9 +11,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@tiptap/pm": "^3.26.1",
-    "@tiptap/react": "^3.26.1",
-    "@tiptap/starter-kit": "^3.26.1",
+    "@tiptap/pm": "^3.31.3",
+    "@tiptap/react": "^3.31.3",
+    "@tiptap/starter-kit": "^3.31.3",
+    "framer-motion": "^13.4.1",
+    "lucide-react": "^1.47.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "react-router-dom": "^7.16.0"
