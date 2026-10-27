@@ -2,6 +2,7 @@ import dotenv from 'dotenv'
 dotenv.config()
 import express from 'express'
 import cors from 'cors'
+import mongoose from 'mongoose'
 import router from './routes/index.js'
 import errorHandler from './middleware/errorHandler.js'
 import { connectDB } from './db.js'
@@ -22,6 +23,11 @@ app.use('/api', async (req, res, next) => {
     console.error('MongoDB error:', err)
     res.status(503).json({ error: 'Database unavailable' })
   }
+})
+// Appelée par la GitHub Action keep-alive : sollicite la base pour éviter la mise en pause du cluster Atlas gratuit
+app.get('/api/ping', async (req, res) => {
+  await mongoose.connection.db.admin().ping()
+  res.json({ status: 'ok', db: 'connected' })
 })
 app.use('/api', router)
 app.use(errorHandler)
